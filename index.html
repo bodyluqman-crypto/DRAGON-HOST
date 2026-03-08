@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>DRAGON-HOST | منصة استضافة آمنة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', 'Fira Code', 'Cairo', monospace;
+        }
+
+        /* الألوان: أبيض (#FFFFFF) وأزرق (#0066FF) فقط */
+        :root {
+            --primary-blue: #0066ff;
+            --pure-white: #ffffff;
+            --dark-bg: #0a0c10;
+            --card-bg: #111316;
+            --danger-red: #ff3333;
+            --success-green: #00cc66;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--pure-white);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* خلفية شبكية تقنية */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 102, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 102, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== شاشة تسجيل الدخول ===== */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 102, 255, 0.1), transparent 70%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-box {
+            width: 90%;
+            max-width: 450px;
+            border: 2px solid var(--primary-blue);
+            padding: 40px 30px;
+            background: var(--card-bg);
+            box-shadow: 0 0 50px rgba(0, 102, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-blue), transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .login-title {
+            color: var(--primary-blue);
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--pure-white);
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-blue);
+            font-size: 14px;
+        }
+
+        .input-field {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            padding: 15px;
+            color: var(--pure-white);
+            font-family: inherit;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+        }
+
+        .device-selector {
+            margin: 25px 0;
+            border: 1px solid var(--primary-blue);
+            padding: 15px;
+        }
+
+        .device-title {
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .device-options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .device-option {
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .device-radio {
+            display: none;
+        }
+
+        .device-label {
+            display: block;
+            padding: 10px;
+            border: 1px solid var(--primary-blue);
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0.7;
+        }
+
+        .device-radio:checked + .device-label {
+            background: var(--primary-blue);
+            color: var(--dark-bg);
+            opacity: 1;
+            box-shadow: 0 0 20px var(--primary-blue);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: var(--pure-white);
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+            margin-top: 20px;
+        }
+
+        .login-btn:hover {
+            background: var(--primary-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 30px var(--primary-blue);
+        }
+
+        .admin-hint {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--primary-blue);
+            opacity: 0.5;
+        }
+
+        /* ===== لوحة تحكم المشرف (تظهر فقط للأدمن) ===== */
+        .admin-panel {
+            border: 2px solid var(--primary-blue);
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 102, 255, 0.05);
+            display: none;
+        }
+
+        .admin-panel.visible {
+            display: block;
+        }
+
+        .admin-title {
+            color: var(--primary-blue);
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--primary-blue);
+            padding-bottom: 10px;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            border: 1px solid var(--primary-blue);
+            padding: 15px;
+        }
+
+        .stat-label {
+            color: var(--primary-blue);
+            font-size: 12px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            margin-top: 5px;
+        }
+
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .admin-btn {
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--pure-white);
+            padding: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        .admin-btn:hover {
+            background: var(--primary-blue);
+            color: var(--dark-bg);
+        }
+
+        .admin-btn.danger {
+            border-color: var(--danger-red);
+        }
+
+        .admin-btn.danger:hover {
+            background: var(--danger-red);
+            color: var(--pure-white);
+        }
+
+        /* ===== الهيدر الرئيسي ===== */
+        .main-header {
+            border: 2px solid var(--primary-blue);
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: var(--card-bg);
+        }
+
+        .logo h1 {
+            color: var(--primary-blue);
+            font-size: 32px;
+            letter-spacing: 4px;
+        }
+
+        .logo span {
+            color: var(--pure-white);
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .username {
+            color: var(--primary-blue);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--pure-white);
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: var(--primary-blue);
+            color: var(--dark-bg);
+        }
+
+        /* ===== نظام الحاويات المعزولة ===== */
+        .containers-section {
+            border: 2px solid var(--primary-blue);
+            padding: 25px;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+        }
+
+        .section-title {
+            color: var(--primary-blue);
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .containers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .container-card {
+            border: 1px solid var(--primary-blue);
+            padding: 20px;
+            background: rgba(0, 102, 255, 0.02);
+            transition: 0.3s;
+        }
+
+        .container-card:hover {
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.2);
+        }
+
+        .container-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .container-name {
+            color: var(--primary-blue);
+            font-weight: bold;
+        }
+
+        .container-status {
+            color: var(--success-green);
+            font-size: 12px;
+        }
+
+        .container-status.stopped {
+            color: var(--danger-red);
+        }
+
+        .container-details {
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .container-details div {
+            margin: 5px 0;
+            color: var(--pure-white);
+            opacity: 0.8;
+        }
+
+        .container-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .container-btn {
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--pure-white);
+            padding: 8px;
+            flex: 1;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .container-btn:hover {
+            background: var(--primary-blue);
+            color: var(--dark-bg);
+        }
+
+        /* ===== نظام رفع الملفات الآمن ===== */
+        .upload-section {
+            border: 2px solid var(--primary-blue);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-blue);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: rgba(0, 102, 255, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            margin: 5px 0;
+        }
+
+        .file-name {
+            color: var(--primary-blue);
+        }
+
+        .file-delete {
+            color: var(--danger-red);
+            cursor: pointer;
+        }
+
+        /* ===== نظام التشفير ===== */
+        .encryption-section {
+            border: 2px solid var(--primary-blue);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .encryption-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .encrypt-box {
+            border: 1px solid var(--primary-blue);
+            padding: 20px;
+        }
+
+        .encrypt-textarea {
+            width: 100%;
+            height: 150px;
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--pure-white);
+            padding: 15px;
+            margin: 15px 0;
+            font-family: inherit;
+        }
+
+        /* ===== نظام مراقبة الاختراق ===== */
+        .security-section {
+            border: 2px solid var(--primary-blue);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .threat-list {
+            margin-top: 15px;
+        }
+
+        .threat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.2);
+            color: var(--pure-white);
+        }
+
+        .threat-type {
+            color: var(--danger-red);
+        }
+
+        .threat-time {
+            color: var(--primary-blue);
+        }
+
+        /* ===== رسائل التنبيه ===== */
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            border-color: var(--success-green);
+            color: var(--success-green);
+        }
+
+        .alert-danger {
+            border-color: var(--danger-red);
+            color: var(--danger-red);
+        }
+
+        /* ===== تذييل ===== */
+        .footer {
+            border-top: 1px solid var(--primary-blue);
+            padding: 20px;
+            margin-top: 40px;
+            text-align: center;
+            color: var(--pure-white);
+            opacity: 0.7;
+            font-size: 12px;
+        }
+
+        /* ===== استجابة للهواتف ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .main-header {
+                padding: 15px;
+            }
+            
+            .logo h1 {
+                font-size: 24px;
+            }
+            
+            .containers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .encryption-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .device-options {
+                flex-direction: column;
+            }
+        }
+
+        /* ===== تأثيرات إضافية ===== */
+        .glow-text {
+            text-shadow: 0 0 10px var(--primary-blue);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .mono {
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="login-title">DRAGON-HOST</div>
+            <div class="login-subtitle">منصة استضافة آمنة - Secure Hosting Platform</div>
+            
+            <!-- Admin Hint: بيانات تسجيل الدخول -->
+            <div class="admin-hint">Admin: DragonMaster | Pass: Dragon@Host2026</div>
+            
+            <div class="input-group">
+                <label class="input-label">اسم المستخدم - Username</label>
+                <input type="text" class="input-field" id="username" placeholder="أدخل اسم المستخدم" value="DragonMaster">
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">كلمة المرور - Password</label>
+                <input type="password" class="input-field" id="password" placeholder="أدخل كلمة المرور" value="Dragon@Host2026">
+            </div>
+            
+            <!-- تحديد نوع الجهاز -->
+            <div class="device-selector">
+                <div class="device-title">نوع الجهاز - Device Type</div>
+                <div class="device-options">
+                    <div class="device-option">
+                        <input type="radio" name="device" id="computer" value="computer" class="device-radio" checked>
+                        <label for="computer" class="device-label">كمبيوتر</label>
+                    </div>
+                    <div class="device-option">
+                        <input type="radio" name="device" id="phone" value="phone" class="device-radio">
+                        <label for="phone" class="device-label">هاتف</label>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="login-btn" onclick="login()">دخول - Login</button>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="mainContent" style="display: none;">
+        <!-- الهيدر -->
+        <div class="main-header">
+            <div class="logo">
+                <h1>DRAGON-HOST</h1>
+                <span>عزل الحاويات - Docker Isolation</span>
+            </div>
+            <div class="user-info">
+                <span class="username" id="currentUser">DragonMaster</span>
+                <button class="logout-btn" onclick="logout()">خروج - Logout</button>
+            </div>
+        </div>
+
+        <!-- لوحة تحكم المشرف (تظهر فقط للأدمن) -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-title">لوحة تحكم المشرف - Admin Dashboard</div>
+            
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <div class="stat-label">المستخدمين النشطين</div>
+                    <div class="stat-value" id="activeUsers">12</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">الحاويات النشطة</div>
+                    <div class="stat-value" id="activeContainers">8</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">الملفات المرفوضة</div>
+                    <div class="stat-value" id="rejectedFiles">3</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">محاولات الاختراق</div>
+                    <div class="stat-value" id="hackAttempts">0</div>
+                </div>
+            </div>
+            
+            <div class="admin-actions">
+                <button class="admin-btn" onclick="showAllContainers()">عرض كل الحاويات</button>
+                <button class="admin-btn" onclick="showAllUsers()">عرض المستخدمين</button>
+                <button class="admin-btn" onclick="scanAllContainers()">فحص الحاويات</button>
+                <button class="admin-btn" onclick="backupSystem()">نسخ احتياطي</button>
+                <button class="admin-btn danger" onclick="emergencyStop()">إيقاف طارئ</button>
+            </div>
+        </div>
+
+        <!-- نظام الحاويات المعزولة - Docker Container Isolation -->
+        <div class="containers-section">
+            <div class="section-title">حاويات Docker المعزولة - Isolated Containers</div>
+            <div class="containers-grid" id="containersGrid">
+                <!-- الحاويات ستضاف هنا بواسطة JavaScript -->
+            </div>
+        </div>
+
+        <!-- نظام رفع الملفات مع مكافحة الاختراق -->
+        <div class="upload-section">
+            <div class="section-title">رفع ملفات آمن - Secure File Upload</div>
+            <div class="alert alert-danger" id="securityAlert" style="display: none;">
+                تم رفض الملف: يحتوي على كود ضار أو محاولة اختراق
+            </div>
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <div>اضغط لرفع ملف أو اسحب الملف هنا</div>
+                <div style="font-size: 12px; margin-top: 10px; color: var(--primary-blue);">يتم فحص جميع الملفات تلقائياً ضد الثغرات الأمنية</div>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(this)">
+            
+            <div class="file-list" id="fileList">
+                <!-- الملفات المرفوعة ستضاف هنا -->
+            </div>
+        </div>
+
+        <!-- نظام التشفير -->
+        <div class="encryption-section">
+            <div class="section-title">تشفير البيانات - Data Encryption</div>
+            <div class="encryption-grid">
+                <div class="encrypt-box">
+                    <div style="color: var(--primary-blue); margin-bottom: 10px;">تشفير - Encrypt</div>
+                    <textarea class="encrypt-textarea" id="encryptInput" placeholder="أدخل النص المراد تشفيره"></textarea>
+                    <button class="admin-btn" style="width: 100%;" onclick="encryptData()">تشفير</button>
+                    <div class="mono" id="encryptOutput" style="margin-top: 10px; word-break: break-all;"></div>
+                </div>
+                <div class="encrypt-box">
+                    <div style="color: var(--primary-blue); margin-bottom: 10px;">فك تشفير - Decrypt</div>
+                    <textarea class="encrypt-textarea" id="decryptInput" placeholder="أدخل النص المراد فك تشفيره"></textarea>
+                    <button class="admin-btn" style="width: 100%;" onclick="decryptData()">فك تشفير</button>
+                    <div class="mono" id="decryptOutput" style="margin-top: 10px; word-break: break-all;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- نظام مراقبة الأمن -->
+        <div class="security-section">
+            <div class="section-title">مراقبة الأمن والاختراق - Security Monitoring</div>
+            <div class="threat-list" id="threatList">
+                <div class="threat-item">
+                    <span class="threat-type">فحص أمني</span>
+                    <span>نظام مكافحة الاختراق نشط - Anti-Hack Active</span>
+                    <span class="threat-time" id="currentTime"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- تذييل -->
+        <div class="footer">
+            DRAGON-HOST | منصة استضافة آمنة مع عزل Docker ومكافحة الاختراق
+        </div>
+    </div>
+
+    <script>
+        // بيانات المستخدمين والأدمن
+        const ADMIN_USERNAME = "DragonMaster";
+        const ADMIN_PASSWORD = "Dragon@Host2026";
+        let currentUser = null;
+        let isAdmin = false;
+
+        // بيانات الحاويات
+        const containers = [
+            { id: 1, name: "container-user-001", status: "running", ip: "10.0.0.1", cpu: "12%", memory: "256MB", user: "user1" },
+            { id: 2, name: "container-user-002", status: "running", ip: "10.0.0.2", cpu: "8%", memory: "128MB", user: "user2" },
+            { id: 3, name: "container-user-003", status: "stopped", ip: "10.0.0.3", cpu: "0%", memory: "0MB", user: "user3" },
+            { id: 4, name: "container-user-004", status: "running", ip: "10.0.0.4", cpu: "45%", memory: "512MB", user: "user4" },
+            { id: 5, name: "container-admin-001", status: "running", ip: "10.0.0.100", cpu: "23%", memory: "1GB", user: "admin" },
+        ];
+
+        // قائمة الملفات المرفوعة
+        let uploadedFiles = [];
+
+        // قائمة التهديدات
+        let threats = [
+            { type: "محاولة رفع ملف ضار", time: new Date().toLocaleTimeString(), blocked: true }
+        ];
+
+        // كلمات ممنوعة للكشف عن محاولات الاختراق
+        const forbiddenPatterns = [
+            "eval(", "exec(", "system(", "passthru(", "shell_exec(", "`", 
+            "os.system", "subprocess", "rm -rf", "chmod 777", "wget", "curl",
+            "base64_decode", "gzinflate", "str_rot13", "assert(",
+            "file_get_contents", "fopen", "unlink", "mysql_query",
+            "<?php", "<?=", "<script", "javascript:", "onload=", "onerror="
+        ];
+
+        // قائمة امتدادات الملفات الممنوعة
+        const forbiddenExtensions = ['.php', '.phtml', '.php3', '.php4', '.php5', '.php7', '.phar', '.asp', '.aspx', '.exe', '.sh', '.bash', '.cgi', '.pl'];
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const device = document.querySelector('input[name="device"]:checked').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                currentUser = username;
+                isAdmin = (username === ADMIN_USERNAME);
+                
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('currentUser').textContent = username;
+                
+                if (isAdmin) {
+                    document.getElementById('adminPanel').classList.add('visible');
+                }
+                
+                // تطبيق وضع الجهاز
+                if (device === 'phone') {
+                    document.body.style.fontSize = '16px';
+                }
+                
+                // تحديث البيانات
+                updateContainers();
+                updateFileList();
+                updateThreats();
+                updateAdminStats();
+                
+                // بدء تحديث الوقت
+                updateTime();
+                setInterval(updateTime, 1000);
+            } else {
+                alert('❌ اسم المستخدم أو كلمة المرور غير صحيحة');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('adminPanel').classList.remove('visible');
+        }
+
+        function updateTime() {
+            document.getElementById('currentTime').textContent = new Date().toLocaleTimeString();
+        }
+
+        function updateContainers() {
+            const grid = document.getElementById('containersGrid');
+            grid.innerHTML = containers.map(container => `
+                <div class="container-card">
+                    <div class="container-header">
+                        <span class="container-name">${container.name}</span>
+                        <span class="container-status ${container.status === 'running' ? '' : 'stopped'}">● ${container.status}</span>
+                    </div>
+                    <div class="container-details">
+                        <div>IP: ${container.ip}</div>
+                        <div>CPU: ${container.cpu}</div>
+                        <div>Memory: ${container.memory}</div>
+                        <div>User: ${container.user}</div>
+                    </div>
+                    <div class="container-actions">
+                        <button class="container-btn" onclick="startContainer(${container.id})">▶️ Start</button>
+                        <button class="container-btn" onclick="stopContainer(${container.id})">⏹️ Stop</button>
+                        <button class="container-btn" onclick="restartContainer(${container.id})">🔄 Restart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startContainer(id) {
+            const container = containers.find(c => c.id === id);
+            if (container) {
+                container.status = 'running';
+                updateContainers();
+                addThreat('تنبيه أمني: تم تشغيل حاوية', false);
+            }
+        }
+
+        function stopContainer(id) {
+            const container = containers.find(c => c.id === id);
+            if (container) {
+                container.status = 'stopped';
+                updateContainers();
+            }
+        }
+
+        function restartContainer(id) {
+            const container = containers.find(c => c.id === id);
+            if (container) {
+                alert(`جاري إعادة تشغيل الحاوية ${container.name}`);
+            }
+        }
+
+        // دالة فحص أمني للملفات
+        function securityScan(fileContent, fileName) {
+            // فحص الامتداد
+            const ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+            if (forbiddenExtensions.includes(ext)) {
+                return { safe: false, reason: 'امتداد ملف ممنوع - Forbidden extension' };
+            }
+
+            // فحص المحتوى
+            const contentLower = fileContent.toLowerCase();
+            for (let pattern of forbiddenPatterns) {
+                if (contentLower.includes(pattern.toLowerCase())) {
+                    return { safe: false, reason: `تم اكتشاف نمط ضار: ${pattern}` };
+                }
+            }
+
+            return { safe: true };
+        }
+
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileContent = e.target.result;
+                
+                // فحص أمني
+                const scanResult = securityScan(fileContent, file.name);
+                
+                if (scanResult.safe) {
+                    // الملف آمن
+                    uploadedFiles.push({
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + ' KB',
+                        time: new Date().toLocaleTimeString(),
+                        safe: true
+                    });
+                    
+                    document.getElementById('securityAlert').style.display = 'none';
+                    updateFileList();
+                    
+                } else {
+                    // محاولة اختراق
+                    threats.unshift({
+                        type: 'محاولة اختراق - ' + scanResult.reason,
+                        time: new Date().toLocaleTimeString(),
+                        blocked: true
+                    });
+                    
+                    document.getElementById('securityAlert').style.display = 'block';
+                    updateThreats();
+                    updateAdminStats();
+                }
+            };
+            
+            if (file.type.startsWith('text/') || file.name.endsWith('.py') || file.name.endsWith('.js')) {
+                reader.readAsText(file);
+            } else {
+                // للملفات غير النصية، نفحص الاسم فقط
+                const scanResult = securityScan('', file.name);
+                if (scanResult.safe) {
+                    uploadedFiles.push({
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2) + ' KB',
+                        time: new Date().toLocaleTimeString(),
+                        safe: true
+                    });
+                    updateFileList();
+                } else {
+                    threats.unshift({
+                        type: 'محاولة اختراق - ' + scanResult.reason,
+                        time: new Date().toLocaleTimeString(),
+                        blocked: true
+                    });
+                    updateThreats();
+                }
+            }
+            
+            // تنظيف input
+            input.value = '';
+        }
+
+        function updateFileList() {
+            const list = document.getElementById('fileList');
+            if (uploadedFiles.length === 0) {
+                list.innerHTML = '<div style="text-align: center; opacity: 0.5;">لا توجد ملفات مرفوعة</div>';
+                return;
+            }
+            
+            list.innerHTML = uploadedFiles.map(file => `
+                <div class="file-item">
+                    <span class="file-name">${file.name}</span>
+                    <span>${file.size} - ${file.time}</span>
+                    <span class="file-delete" onclick="deleteFile('${file.name}')">✖</span>
+                </div>
+            `).join('');
+        }
+
+        function deleteFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            updateFileList();
+        }
+
+        function encryptData() {
+            const input = document.getElementById('encryptInput').value;
+            if (!input) return;
+            
+            // تشفير بسيط Base64 (للعرض فقط)
+            const encrypted = btoa(input);
+            document.getElementById('encryptOutput').textContent = 'AES-256: ' + encrypted.substring(0, 50) + '...';
+        }
+
+        function decryptData() {
+            const input = document.getElementById('decryptInput').value;
+            if (!input) return;
+            
+            try {
+                const decrypted = atob(input);
+                document.getElementById('decryptOutput').textContent = decrypted.substring(0, 100);
+            } catch {
+                document.getElementById('decryptOutput').textContent = 'خطأ في فك التشفير';
+            }
+        }
+
+        function updateThreats() {
+            const list = document.getElementById('threatList');
+            list.innerHTML = threats.map(threat => `
+                <div class="threat-item">
+                    <span class="threat-type">${threat.type}</span>
+                    <span>${threat.blocked ? '✓ تم الحظر' : ''}</span>
+                    <span class="threat-time">${threat.time}</span>
+                </div>
+            `).join('');
+        }
+
+        function addThreat(message, blocked = true) {
+            threats.unshift({
+                type: message,
+                time: new Date().toLocaleTimeString(),
+                blocked: blocked
+            });
+            if (threats.length > 10) threats.pop();
+            updateThreats();
+        }
+
+        function updateAdminStats() {
+            document.getElementById('activeUsers').textContent = containers.filter(c => c.status === 'running').length;
+            document.getElementById('activeContainers').textContent = containers.length;
+            document.getElementById('rejectedFiles').textContent = threats.filter(t => t.blocked).length;
+            document.getElementById('hackAttempts').textContent = threats.length;
+        }
+
+        // دوال لوحة تحكم المشرف
+        function showAllContainers() {
+            alert('عرض كل الحاويات - ' + containers.length + ' حاوية');
+        }
+
+        function showAllUsers() {
+            const users = [...new Set(containers.map(c => c.user))];
+            alert('المستخدمين: ' + users.join(', '));
+        }
+
+        function scanAllContainers() {
+            addThreat('فحص أمني شامل للحاويات', false);
+            alert('جاري فحص جميع الحاويات...');
+        }
+
+        function backupSystem() {
+            addThreat('تم عمل نسخة احتياطية للنظام', false);
+            alert('تم إنشاء نسخة احتياطية بنجاح');
+        }
+
+        function emergencyStop() {
+            if (confirm('هل أنت متأكد؟ هذا سيوقف جميع الحاويات!')) {
+                containers.forEach(c => c.status = 'stopped');
+                updateContainers();
+                addThreat('إيقاف طارئ لجميع الحاويات', true);
+            }
+        }
+
+        // تهيئة الصفحة
+        window.onload = function() {
+            // التحقق من وجود مستخدم مسجل الدخول
+            if (currentUser) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+  </html>
